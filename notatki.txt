@@ -1,0 +1,32 @@
+Aktywacja:      npm run dev
+Testowanie:    http://localhost:3000
+
+
+/* TEST DZIAŁANIA - tworzenie kategorii i produktu
+const Category = require("./models/Category");
+app.get("/test-category", async (req, res) => {
+    const [category] = await Category.findOrCreate({
+        where: { name: "Elektronika" },
+        defaults: { name: "Elektronika" }
+    });
+
+    res.json(category);
+});
+
+const Product = require("./models/Product");
+app.get("/test-product", async (req, res) => {
+  let category = await Category.findByPk(1);
+  if (!category) {
+    category = await Category.create({ name: "Elektronika" });
+  }
+
+  const product = await Product.create({
+    name: "Laptop",
+    description: "Super laptop",
+    price: 3000,
+    CategoryId: category.id
+  });
+
+  res.json(product);
+});
+*/

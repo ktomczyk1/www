@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sklep</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+
+<h1 class="my-3">Sklep</h1>
+<!-- Koszyk ewentualnie gdzieś indziej wkleić -->
+<a href="/cart.html" class="btn btn-dark mb-3"> 
+    Koszyk
+</a>
+
+<div id="products" class="row"></div>
+
+<script>
+async function loadProducts() {
+    const res = await fetch('/api/products');
+    const products = await res.json();
+
+    const container = document.getElementById('products');
+
+    container.innerHTML = products.map(p => `
+        <div class="col-md-4">
+            <div class="card p-3 m-2">
+                <h5>${p.name}</h5>
+                <p>${p.description}</p>
+                <b>${p.price} zł</b>
+                <button onclick="addToCart(${p.id})" class="btn btn-primary mt-2">
+                    Dodaj do koszyka
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function addToCart(id) {
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    const item = cart.find(i => i.id === id);
+
+    if (item) item.qty++;
+    else cart.push({ id, qty: 1 });
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    alert('Dodano do koszyka');
+}
+
+loadProducts();
+</script>
+
+</body>
+</html>

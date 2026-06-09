@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Checkout</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+
+<h1 class="my-3">Dane zamówienia</h1>
+
+<form id="form">
+
+    <input class="form-control my-2" placeholder="Imię" id="firstName" required>
+    <input class="form-control my-2" placeholder="Nazwisko" id="lastName" required>
+    <input class="form-control my-2" placeholder="Email" id="email" required>
+    <input class="form-control my-2" placeholder="Telefon" id="phone">
+    <textarea class="form-control my-2" placeholder="Adres" id="address" required></textarea>
+
+    <button class="btn btn-success">Złóż zamówienie</button>
+
+</form>
+
+<script>
+document.getElementById("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    const data = {
+        firstName: firstName.value,
+        lastName: lastName.value,
+        email: email.value,
+        phone: phone.value,
+        address: address.value,
+        cart
+    };
+
+    const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    alert("Zamówienie złożone! ID: " + result.orderId);
+
+    localStorage.removeItem("cart");
+
+    window.location.href = "/";
+});
+</script>
+
+</body>
+</html>

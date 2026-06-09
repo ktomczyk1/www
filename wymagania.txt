@@ -1,0 +1,11 @@
+- sklep z panelem admina, ktory bedzie zrobiony w gotowej bibliotece
+- admin definiuje liste kategorii, kategorie sa jednopoziomowe (bez zagniezdzania)
+- admin definiuje towary i przypisuje je do kategorii (nazwa, opis, zdjecie, cena, byc moze dodatkowe parametry)
+- admin moze tez ogladac zlozone zamowienia i przypisane do nich towary oraz status tych zamowien
+- sklep nie wymaga logowania uzytkownikow
+- gosc na stronie sklepu przeglada kategorie i moze wlozyc wybrane towary do koszyka wskazujac zamawianą liczbę
+- nastepnie podaje dane osobowe/dostawy, zamowienie jest dodawane do bazy danych i przechodzi do platnosci
+- platnosc za pomoca bitpay/przelewy24/tpay/payu lub innego procesora platnosci - trzeba samodzielnie zbadac,
+  ktore z nich bez zbednych formalnosci oferują sandbox i wybrac sobie jeden z nich do implementacji
+- jesli uzytkownik w trybie testowym zaplaci (sztucznymi pieniedzmi) i wroci na strone sklepu,
+  a platnosc zostanie zweryfikowana, to zamowienie jest automaycznie oznaczane jako oplacone
