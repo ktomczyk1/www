@@ -1,6 +1,7 @@
 let allProducts = [];
 let allCategories = [];
 let selectedCategoryId = null;
+let currentSearch = '';
 
 async function loadCategories() {
     try {
@@ -8,12 +9,12 @@ async function loadCategories() {
         const categories = await res.json();
         allCategories = categories;
         
-        const container = document.getElementById('categories');
-        container.innerHTML = categories.map(c => `
-            <div class="category-item" onclick="filterByCategory(${c.id})" data-id="${c.id}">
-                ${c.name}
-            </div>
-        `).join('');
+            const container = document.getElementById('categories');
+            container.innerHTML = categories.map(c => `
+                <div class="category-item" onclick="filterByCategory(event, ${c.id})" data-id="${c.id}">
+                    ${c.name}
+                </div>
+            `).join('');
     } catch (error) {
         console.error('Błąd ładowania kategorii:', error);
     }
@@ -94,34 +95,39 @@ function renderProducts(products) {
     }).join('');
 }
 
-function filterByCategory(categoryId) {
+function applyFilter() {
+    if (currentSearch && currentSearch.length > 0) {
+        const filtered = allProducts.filter(p => p.name && p.name.toLowerCase().includes(currentSearch));
+        renderProducts(filtered);
+        return;
+    }
+
+    if (selectedCategoryId === null) {
+        renderProducts(allProducts);
+    } else {
+        const filtered = allProducts.filter(p => p.CategoryId === selectedCategoryId);
+        renderProducts(filtered);
+    }
+}
+
+function filterByCategory(evt, categoryId) {
     const items = document.querySelectorAll('.category-item');
-    
-    // Konwertuj na liczbę jeśli nie jest null
+
     const numCategoryId = categoryId !== null ? parseInt(categoryId) : null;
-    
-    // Znajdź kliknięty element
-    const clickedItem = event.target.closest('.category-item');
-    
-    // Toggle - jeśli kliknięta kategoria jest już aktywna, odznacz ją
+    const clickedItem = evt.target.closest('.category-item');
+
     if (clickedItem && clickedItem.classList.contains('active') && numCategoryId !== null) {
         items.forEach(item => item.classList.remove('active'));
         selectedCategoryId = null;
-        renderProducts(allProducts);
+        applyFilter();
         return;
     }
-    
+
     selectedCategoryId = numCategoryId;
     items.forEach(item => item.classList.remove('active'));
-    
-    if (numCategoryId === null) {
-        renderProducts(allProducts);
-    } else {
-        clickedItem.classList.add('active');
-        const filtered = allProducts.filter(p => p.CategoryId === numCategoryId);
-        console.log(`Filtrowanie kategorii ${numCategoryId}, znaleziono ${filtered.length} produktów`);
-        renderProducts(filtered);
-    }
+
+    if (clickedItem) clickedItem.classList.add('active');
+    applyFilter();
 }
 
 function addToCart(id) {
@@ -203,3 +209,14 @@ function scrollCategories(direction) {
 // Initialize
 loadCategories();
 loadProducts();
+
+// Search input handling (search by title only)
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('productSearch');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value.trim().toLowerCase();
+        applyFilter();
+    });
+});
