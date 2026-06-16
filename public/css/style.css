@@ -95,6 +95,31 @@ body {
     text-decoration: none;
 }
 
+.cart-dropdown {
+    position: relative;
+}
+
+.cart-btn {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    background-color: var(--primary);
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(160, 127, 97, 0.3);
+    background-color: var(--primary-dark);
+    color: white;
+}
+
 .cart-info {
     display: none;
     background-color: #ffffff;
@@ -106,13 +131,160 @@ body {
     color: var(--text-primary);
     text-align: center;
     min-width: 150px;
+    margin-top: 0.4rem;
 }
 
-.btn-clear-cart {
-    display: none;
-    width: 100%;
+/* Cart Dropdown */
+.cart-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 380px;
+    max-width: 90vw;
+    box-shadow: 0 12px 40px rgba(82, 63, 42, 0.15);
     margin-top: 0.5rem;
-    padding: 0.45rem 0.75rem;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    flex-direction: column;
+    max-height: 600px;
+    z-index: 1100;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.cart-dropdown-menu.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.cart-dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+    color: var(--text-primary);
+}
+
+.cart-dropdown-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.cart-item-dropdown {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--secondary-light);
+    align-items: center;
+}
+
+.cart-item-dropdown:last-child {
+    border-bottom: none;
+}
+
+.cart-item-info-dropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.cart-item-name-dropdown {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.cart-item-price-dropdown {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.cart-item-qty-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.qty-btn-mini {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background-color: var(--secondary-light);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.qty-btn-mini:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.qty-display-mini {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.cart-dropdown-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-checkout {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-checkout:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-clear {
+    padding: 0.65rem 1rem;
     background-color: #c1463e;
     color: white;
     border: none;
@@ -121,12 +293,21 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
-.btn-clear-cart:hover {
+.btn-clear:hover {
     background-color: #9b2c22;
-    transform: translateY(-1px);
 }
+
+.cart-empty-dropdown {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
 
 /* Categories Sidebar */
 
@@ -206,6 +387,27 @@ body {
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
+    position: relative;
+    cursor: pointer;
+}
+
+.qty-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    z-index: 10;
+    box-shadow: 0 3px 12px rgba(160, 127, 97, 0.3);
+    border: 2px solid var(--surface);
 }
 
 .product-card:hover {
@@ -491,6 +693,60 @@ body {
 .product-modal-footer {
     display: flex;
     gap: 1rem;
+    align-items: center;
+}
+
+.modal-quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--secondary-light);
+    border-radius: 10px;
+    padding: 0.5rem;
+    flex-shrink: 0;
+}
+
+.qty-btn-modal {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.qty-btn-modal:hover {
+    background-color: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.qty-btn-modal:active {
+    transform: scale(0.95);
+}
+
+.qty-btn-modal:disabled {
+    background-color: var(--secondary-light);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+.qty-btn-modal:disabled:hover {
+    background-color: var(--secondary-light);
+    transform: none;
+}
+
+.qty-display-modal {
+    min-width: 40px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
 }
 
 .btn-add-modal {

@@ -22,16 +22,30 @@
                 <div class="search-wrapper">
                     <input type="search" id="productSearch" placeholder="Szukaj produktów..." aria-label="Szukaj produktów">
                 </div>
-                <a href="/cart.html" class="cart-btn-wrapper"> 
-                    <div class="btn btn-dark cart-btn"> 
+                <div class="cart-dropdown" id="cartDropdownWrapper" onmouseover="openCartDropdown()" onmouseout="closeCartDropdownDelay()">
+                    <button class="cart-btn" id="cartToggleBtn">
                         <i class="bi bi-bag"></i>
                         <span>Koszyk</span>
-                    </div>
+                    </button>
                     <div class="cart-info" id="cartInfo" style="display: none;"></div>
-                </a>
-                <button class="btn-clear-cart" id="clearCartBtn" style="display: none;" onclick="clearCartWithConfirm()">
-                    <i class="bi bi-trash3"></i> Wyczyść
-                </button>
+                    <div class="cart-dropdown-menu" id="cartDropdownMenu">
+                        <div class="cart-dropdown-header">
+                            <span>Twój koszyk</span>
+                            <button class="close-btn" onclick="closeCartDropdown()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <div class="cart-dropdown-items" id="cartDropdownItems">
+                            <!-- Items rendered here -->
+                        </div>
+                        <div class="cart-dropdown-footer">
+                            <a href="/cart.html" class="btn-checkout">Przejdź do koszyka</a>
+                            <button class="btn-clear" id="clearCartBtnDropdown" onclick="clearCartWithConfirm()" style="display: none;">
+                                <i class="bi bi-trash3"></i> Wyczyść
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -77,7 +91,16 @@
                     <p id="modalDescription"></p>
                 </div>
                 <div class="product-modal-footer">
-                    <button onclick="addToCartFromModal()" class="btn-add-modal">
+                    <div class="modal-quantity-controls">
+                        <button class="qty-btn-modal" id="modalQtyMinus" onclick="decrementModalQuantity()">
+                            <i class="bi bi-dash-lg"></i>
+                        </button>
+                        <span class="qty-display-modal" id="modalQtyDisplay">1</span>
+                        <button class="qty-btn-modal" id="modalQtyPlus" onclick="incrementModalQuantity()">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                    <button onclick="addMultipleToCart()" class="btn-add-modal">
                         <i class="bi bi-plus-lg"></i> Dodaj do koszyka
                     </button>
                 </div>
