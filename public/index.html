@@ -35,24 +35,16 @@
 </div>
 
 <!-- Main Content -->
-<div class="container-lg">
-    <!-- Categories Section -->
-    <div class="categories-wrapper">
-        <button class="scroll-arrow scroll-left" id="scrollLeft" onclick="scrollCategories('left')">
-            <i class="bi bi-chevron-left"></i>
-        </button>
-        <div class="categories-scroll" id="categoriesScroll">
-            <div class="categories-container" id="categories">
-                <!-- Kategorie będą wstawione tutaj przez JS -->
-            </div>
+<div class="container-lg main-layout">
+    <aside class="sidebar">
+        <h2 class="sidebar-title">Kategorie</h2>
+        <div class="categories-container" id="categories">
+            <!-- Kategorie będą wstawione tutaj przez JS -->
         </div>
-        <button class="scroll-arrow scroll-right" id="scrollRight" onclick="scrollCategories('right')">
-            <i class="bi bi-chevron-right"></i>
-        </button>
-    </div>
-    
-    <!-- Products Grid -->
-    <div class="products-grid" id="products"></div>
+    </aside>
+    <main class="content">
+        <div class="products-grid" id="products"></div>
+    </main>
 </div>
 
 <script src="js/index.js"></script>
