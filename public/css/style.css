@@ -26,11 +26,14 @@ body {
     box-shadow: 0 2px 4px var(--shadow);
 }
 
-.store-name {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary-dark);
-    margin: 0;
+.store-logo {
+    display: inline-block;
+}
+
+.logo-image {
+    max-height: 60px;
+    width: auto;
+    display: block;
 }
 
 .cart-btn {
