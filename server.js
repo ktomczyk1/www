@@ -16,6 +16,7 @@ const app = express();
 app.use(adminJs.options.rootPath, router);
 app.use(express.static("public"));
 app.use(express.json());
+app.use('/uploads', express.static('public/uploads'));
 
 app.get("/", (req, res) => {
     res.send("Sklep działa");

@@ -4,84 +4,26 @@
     <meta charset="utf-8">
     <title>Koszyk</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="container">
+<body>
 
-<h1 class="my-3">Koszyk</h1>
+<!-- Header -->
+<div class="cart-header">
+    <div class="cart-container">
+        <h1 class="cart-title">
+            <i class="bi bi-bag"></i> Mój koszyk
+        </h1>
+    </div>
+</div>
 
-<div id="cart"></div>
+<!-- Cart Content -->
+<div class="cart-container">
+    <div id="cartContent"></div>
+</div>
 
-<h3 id="total"></h3>
-
-<button class="btn btn-success" onclick="checkout()">
-    Przejdź do zamówienia
-</button>
-
-<script>
-let products = [];
-
-async function loadProducts() {
-    const res = await fetch('/api/products');
-    products = await res.json();
-    renderCart();
-}
-
-function getCart() {
-    return JSON.parse(localStorage.getItem('cart') || '[]');
-}
-
-function saveCart(cart) {
-    localStorage.setItem('cart', JSON.stringify(cart));
-}
-
-function renderCart() {
-    const cart = getCart();
-    const container = document.getElementById('cart');
-
-    let total = 0;
-
-    if (cart.length === 0) {
-        container.innerHTML = "<p>Koszyk jest pusty</p>";
-        document.getElementById('total').innerText = "";
-        return;
-    }
-
-    container.innerHTML = cart.map(item => {
-        const product = products.find(p => p.id === item.id);
-
-        const sum = product.price * item.qty;
-        total += sum;
-
-        return `
-            <div class="border p-2 my-2">
-                <h5>${product.name}</h5>
-                <p>Ilość: ${item.qty}</p>
-                <p>Cena: ${product.price} zł</p>
-                <p>Suma: ${sum} zł</p>
-
-                <button onclick="removeItem(${item.id})" class="btn btn-danger btn-sm">
-                    Usuń
-                </button>
-            </div>
-        `;
-    }).join('');
-
-    document.getElementById('total').innerText = "Suma: " + total + " zł";
-}
-
-function removeItem(id) {
-    let cart = getCart();
-    cart = cart.filter(i => i.id !== id);
-    saveCart(cart);
-    renderCart();
-}
-
-function checkout() {
-    window.location.href = "/checkout.html";
-}
-
-loadProducts();
-</script>
+<script src="js/cart.js"></script>
 
 </body>
 </html>

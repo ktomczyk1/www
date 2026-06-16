@@ -4,53 +4,56 @@
     <meta charset="utf-8">
     <title>Sklep</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="container">
+<body>
 
-<h1 class="my-3">Sklep</h1>
-<!-- Koszyk ewentualnie gdzieś indziej wkleić -->
-<a href="/cart.html" class="btn btn-dark mb-3"> 
-    Koszyk
-</a>
-
-<div id="products" class="row"></div>
-
-<script>
-async function loadProducts() {
-    const res = await fetch('/api/products');
-    const products = await res.json();
-
-    const container = document.getElementById('products');
-
-    container.innerHTML = products.map(p => `
-        <div class="col-md-4">
-            <div class="card p-3 m-2">
-                <h5>${p.name}</h5>
-                <p>${p.description}</p>
-                <b>${p.price} zł</b>
-                <button onclick="addToCart(${p.id})" class="btn btn-primary mt-2">
-                    Dodaj do koszyka
+<!-- Header -->
+<div class="header">
+    <div class="container-lg">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="store-name">Sklep</h1>
+            </div>
+            <div class="col-auto">
+                <a href="/cart.html" class="cart-btn-wrapper"> 
+                    <div class="btn btn-dark cart-btn"> 
+                        <i class="bi bi-bag"></i>
+                        <span>Koszyk</span>
+                    </div>
+                    <div class="cart-info" id="cartInfo" style="display: none;"></div>
+                </a>
+                <button class="btn-clear-cart" id="clearCartBtn" style="display: none;" onclick="clearCartWithConfirm()">
+                    <i class="bi bi-trash3"></i> Wyczyść
                 </button>
             </div>
         </div>
-    `).join('');
-}
+    </div>
+</div>
 
-function addToCart(id) {
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+<!-- Main Content -->
+<div class="container-lg">
+    <!-- Categories Section -->
+    <div class="categories-wrapper">
+        <button class="scroll-arrow scroll-left" id="scrollLeft" onclick="scrollCategories('left')">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <div class="categories-scroll" id="categoriesScroll">
+            <div class="categories-container" id="categories">
+                <!-- Kategorie będą wstawione tutaj przez JS -->
+            </div>
+        </div>
+        <button class="scroll-arrow scroll-right" id="scrollRight" onclick="scrollCategories('right')">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+    
+    <!-- Products Grid -->
+    <div class="products-grid" id="products"></div>
+</div>
 
-    const item = cart.find(i => i.id === id);
-
-    if (item) item.qty++;
-    else cart.push({ id, qty: 1 });
-
-    localStorage.setItem('cart', JSON.stringify(cart));
-
-    alert('Dodano do koszyka');
-}
-
-loadProducts();
-</script>
+<script src="js/index.js"></script>
 
 </body>
 </html>
