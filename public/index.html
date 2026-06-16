@@ -50,6 +50,23 @@
     </main>
 </div>
 
+<!-- Product Modal -->
+<div id="productModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button class="modal-close" onclick="closeProductModal()" aria-label="Zamknij">×</button>
+        <div class="modal-body">
+            <div class="modal-left">
+                <img id="modalImage" src="/uploads/No_Image_Available.jpg" alt="Zdjęcie produktu">
+            </div>
+            <div class="modal-right">
+                <h3 id="modalTitle"></h3>
+                <h4 class="params-heading">Opis i Parametry</h4>
+                <p id="modalDescription" class="modal-description"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="js/index.js"></script>
 
 </body>

@@ -50,7 +50,7 @@ function renderProducts(products) {
         if (qty === 0) {
             // Przycisk Dodaj
             return `
-                <div class="product-card">
+                <div class="product-card" onclick="openProductModal(${p.id})">
                     <div class="product-image-container">
                         <img src="${imageUrl}" alt="${p.name}" class="product-image">
                     </div>
@@ -69,7 +69,7 @@ function renderProducts(products) {
         } else {
             // Interfejs z przyciskami - i +
             return `
-                <div class="product-card">
+                <div class="product-card" onclick="openProductModal(${p.id})">
                     <div class="product-image-container">
                         <img src="${imageUrl}" alt="${p.name}" class="product-image">
                     </div>
@@ -219,4 +219,38 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSearch = e.target.value.trim().toLowerCase();
         applyFilter();
     });
+});
+
+/* Product modal functions */
+function openProductModal(id) {
+    const product = allProducts.find(p => p.id === id);
+    if (!product) return;
+
+    const modal = document.getElementById('productModal');
+    const title = document.getElementById('modalTitle');
+    const desc = document.getElementById('modalDescription');
+    const img = document.getElementById('modalImage');
+
+    title.textContent = product.name || '';
+    desc.textContent = product.description || 'Brak opisu produktu.';
+    img.src = (product.image && product.image.trim() !== '') ? `/uploads/${product.image}` : '/uploads/No_Image_Available.jpg';
+
+    modal.classList.add('open');
+}
+
+function closeProductModal() {
+    const modal = document.getElementById('productModal');
+    if (!modal) return;
+    modal.classList.remove('open');
+}
+
+// close modal when clicking outside content or pressing Escape
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('productModal');
+    if (!modal) return;
+    if (e.target === modal) closeProductModal();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeProductModal();
 });
