@@ -51,17 +51,36 @@
 </div>
 
 <!-- Product Modal -->
-<div id="productModal" class="modal" aria-hidden="true">
-    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <button class="modal-close" onclick="closeProductModal()" aria-label="Zamknij">×</button>
-        <div class="modal-body">
-            <div class="modal-left">
+<div id="productModal" class="product-modal-overlay" aria-hidden="true">
+    <div class="product-modal-container" role="dialog" aria-modal="true">
+        <button class="modal-close-btn" onclick="closeProductModal()" aria-label="Zamknij">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="product-modal-inner">
+            <div class="product-modal-image">
                 <img id="modalImage" src="/uploads/No_Image_Available.jpg" alt="Zdjęcie produktu">
             </div>
-            <div class="modal-right">
-                <h3 id="modalTitle"></h3>
-                <h4 class="params-heading">Opis i Parametry</h4>
-                <p id="modalDescription" class="modal-description"></p>
+            <div class="product-modal-details">
+                <h2 id="modalTitle"></h2>
+                <div class="product-modal-price-stock">
+                    <div class="price-section">
+                        <span class="label">Cena:</span>
+                        <span class="price" id="modalPrice"></span>
+                    </div>
+                    <div class="stock-section">
+                        <span class="label">Dostępność:</span>
+                        <span class="stock" id="modalStock"></span>
+                    </div>
+                </div>
+                <div class="product-modal-description">
+                    <h4>Opis i Parametry</h4>
+                    <p id="modalDescription"></p>
+                </div>
+                <div class="product-modal-footer">
+                    <button onclick="addToCartFromModal()" class="btn-add-modal">
+                        <i class="bi bi-plus-lg"></i> Dodaj do koszyka
+                    </button>
+                </div>
             </div>
         </div>
     </div>

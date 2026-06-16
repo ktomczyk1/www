@@ -2,6 +2,7 @@ let allProducts = [];
 let allCategories = [];
 let selectedCategoryId = null;
 let currentSearch = '';
+let currentModalProductId = null;
 
 async function loadCategories() {
     try {
@@ -226,22 +227,44 @@ function openProductModal(id) {
     const product = allProducts.find(p => p.id === id);
     if (!product) return;
 
+    currentModalProductId = id;
+
     const modal = document.getElementById('productModal');
     const title = document.getElementById('modalTitle');
     const desc = document.getElementById('modalDescription');
     const img = document.getElementById('modalImage');
+    const price = document.getElementById('modalPrice');
+    const stock = document.getElementById('modalStock');
 
     title.textContent = product.name || '';
     desc.textContent = product.description || 'Brak opisu produktu.';
     img.src = (product.image && product.image.trim() !== '') ? `/uploads/${product.image}` : '/uploads/No_Image_Available.jpg';
+    price.textContent = `${product.price} zł`;
+    
+    const stockEl = document.getElementById('modalStock');
+    if (product.stock > 0) {
+        stockEl.textContent = `${product.stock} szt. dostępne`;
+        stockEl.classList.remove('out-of-stock');
+    } else {
+        stockEl.textContent = 'Brak w magazynie';
+        stockEl.classList.add('out-of-stock');
+    }
 
     modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeProductModal() {
     const modal = document.getElementById('productModal');
     if (!modal) return;
     modal.classList.remove('open');
+    document.body.style.overflow = 'auto';
+    currentModalProductId = null;
+}
+
+function addToCartFromModal() {
+    if (!currentModalProductId) return;
+    addToCart(currentModalProductId);
 }
 
 // close modal when clicking outside content or pressing Escape
