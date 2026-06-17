@@ -65,7 +65,7 @@ function renderProducts(products) {
                         <p class="product-description">${p.description}</p>
                         <div class="product-footer">
                             <span class="product-price">${p.price} zł</span>
-                            <button onclick="event.stopPropagation(); addToCart(event, ${p.id})" class="btn btn-primary btn-sm add-to-cart-btn">
+                            <button onclick="addToCart(event, ${p.id})" class="btn btn-primary btn-sm add-to-cart-btn">
                                 <i class="bi bi-plus-lg"></i> Dodaj
                             </button>
                         </div>
@@ -86,11 +86,11 @@ function renderProducts(products) {
                         <div class="product-footer">
                             <span class="product-price">${p.price} zł</span>
                             <div class="product-quantity-controls">
-                                <button onclick="event.stopPropagation(); removeFromCart(event, ${p.id})" class="qty-btn qty-minus">
+                                <button onclick="removeFromCart(event, ${p.id})" class="qty-btn qty-minus">
                                     <i class="bi bi-dash-lg"></i>
                                 </button>
                                 <span class="qty-display">${qty}</span>
-                                <button onclick="event.stopPropagation(); addToCart(event, ${p.id})" class="qty-btn qty-plus">
+                                <button onclick="addToCart(event, ${p.id})" class="qty-btn qty-plus">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
                             </div>
