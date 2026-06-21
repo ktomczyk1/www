@@ -67,8 +67,36 @@ const adminJs = new AdminJS({
         })
       ]
     },
-    Order, 
-    OrderItem
+    {
+      resource: Order,
+      options: {
+        titleProperty: "id",
+        properties: {
+          id: {
+            isTitle: true,
+            isVisible: { list: true, filter: true, show: true, edit: false }
+          }
+        }
+      }
+    },
+    {
+      resource: OrderItem,
+      options: {
+        listProperties: ["id", "orderId", "productId", "quantity", "price", "createdAt"],
+        editProperties: ["orderId", "productId", "quantity", "price"],
+        showProperties: ["id", "orderId", "productId", "quantity", "price", "createdAt", "updatedAt"],
+        properties: {
+          orderId: {
+            reference: "Orders",
+            isRequired: true
+          },
+          productId: {
+            reference: "Products",
+            isRequired: true
+          }
+        }
+      }
+    }
   ]
 });
 

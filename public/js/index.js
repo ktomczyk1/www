@@ -3,7 +3,6 @@ let allCategories = [];
 let selectedCategoryId = null;
 let currentSearch = '';
 let currentModalProductId = null;
-let currentModalQuantity = 1;
 
 async function loadCategories() {
     try {
@@ -27,17 +26,59 @@ async function loadProducts() {
         const res = await fetch('/api/products');
         const products = await res.json();
         allProducts = products;
-        
-        renderProducts(products);
-        updateCartBadge(); // Aktualizuj badge TUTAJ, po załadowaniu produktów
+
+        validateCartAgainstStock(allProducts);
+        renderProducts(getFilteredProducts());
+        updateCartBadge();
     } catch (error) {
         console.error('Błąd ładowania produktów:', error);
     }
 }
 
+function getFilteredProducts() {
+    if (currentSearch && currentSearch.length > 0) {
+        return allProducts.filter(p => p.name && p.name.toLowerCase().includes(currentSearch));
+    }
+
+    if (selectedCategoryId === null) {
+        return allProducts;
+    }
+
+    return allProducts.filter(p => p.CategoryId === selectedCategoryId);
+}
+
+function renderProductCartAction(product, cart) {
+    const qty = getCartQty(cart, product.id);
+
+    if (qty === 0) {
+        if (isProductUnavailable(product, cart)) {
+            return '<span class="product-unavailable">Produkt niedostępny</span>';
+        }
+
+        return `
+            <button onclick="addToCart(event, ${product.id})" class="btn btn-primary btn-sm add-to-cart-btn">
+                <i class="bi bi-plus-lg"></i> Dodaj
+            </button>
+        `;
+    }
+
+    const plusDisabled = canAddToCart(product, cart) ? '' : 'disabled';
+    return `
+        <div class="product-quantity-controls">
+            <button onclick="removeFromCart(event, ${product.id})" class="qty-btn qty-minus">
+                <i class="bi bi-dash-lg"></i>
+            </button>
+            <span class="qty-display">${qty}</span>
+            <button onclick="addToCart(event, ${product.id})" class="qty-btn qty-plus" ${plusDisabled}>
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
+    `;
+}
+
 function renderProducts(products) {
     const container = document.getElementById('products');
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cart = getCart();
     
     if (products.length === 0) {
         container.innerHTML = '<p class="col-12 text-center text-muted">Brak produktów w tej kategorii</p>';
@@ -48,73 +89,30 @@ function renderProducts(products) {
         const cartItem = cart.find(i => i.id === p.id);
         const qty = cartItem ? cartItem.qty : 0;
         const imageUrl = p.image && p.image.trim() !== '' ? `/uploads/${p.image}` : '/uploads/No_Image_Available.jpg';
-        
-        // Badge z ilością w koszyku
         const qtyBadgeHtml = qty > 0 ? `<div class="qty-badge">${qty}</div>` : '';
-        
-        if (qty === 0) {
-            // Przycisk Dodaj
-            return `
-                <div class="product-card" onclick="openProductModal(${p.id})">
-                    ${qtyBadgeHtml}
-                    <div class="product-image-container">
-                        <img src="${imageUrl}" alt="${p.name}" class="product-image">
-                    </div>
-                    <div class="product-body">
-                        <h5 class="product-name">${p.name}</h5>
-                        <p class="product-description">${p.description}</p>
-                        <div class="product-footer">
-                            <span class="product-price">${p.price} zł</span>
-                            <button onclick="addToCart(event, ${p.id})" class="btn btn-primary btn-sm add-to-cart-btn">
-                                <i class="bi bi-plus-lg"></i> Dodaj
-                            </button>
-                        </div>
+        const cartActionHtml = renderProductCartAction(p, cart);
+
+        return `
+            <div class="product-card" onclick="openProductModal(${p.id})">
+                ${qtyBadgeHtml}
+                <div class="product-image-container">
+                    <img src="${imageUrl}" alt="${p.name}" class="product-image">
+                </div>
+                <div class="product-body">
+                    <h5 class="product-name">${p.name}</h5>
+                    <p class="product-description">${p.description}</p>
+                    <div class="product-footer">
+                        <span class="product-price">${p.price} zł</span>
+                        ${cartActionHtml}
                     </div>
                 </div>
-            `;
-        } else {
-            // Interfejs z przyciskami - i +
-            return `
-                <div class="product-card" onclick="openProductModal(${p.id})">
-                    ${qtyBadgeHtml}
-                    <div class="product-image-container">
-                        <img src="${imageUrl}" alt="${p.name}" class="product-image">
-                    </div>
-                    <div class="product-body">
-                        <h5 class="product-name">${p.name}</h5>
-                        <p class="product-description">${p.description}</p>
-                        <div class="product-footer">
-                            <span class="product-price">${p.price} zł</span>
-                            <div class="product-quantity-controls">
-                                <button onclick="removeFromCart(event, ${p.id})" class="qty-btn qty-minus">
-                                    <i class="bi bi-dash-lg"></i>
-                                </button>
-                                <span class="qty-display">${qty}</span>
-                                <button onclick="addToCart(event, ${p.id})" class="qty-btn qty-plus">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+            </div>
+        `;
     }).join('');
 }
 
 function applyFilter() {
-    if (currentSearch && currentSearch.length > 0) {
-        const filtered = allProducts.filter(p => p.name && p.name.toLowerCase().includes(currentSearch));
-        renderProducts(filtered);
-        return;
-    }
-
-    if (selectedCategoryId === null) {
-        renderProducts(allProducts);
-    } else {
-        const filtered = allProducts.filter(p => p.CategoryId === selectedCategoryId);
-        renderProducts(filtered);
-    }
+    renderProducts(getFilteredProducts());
 }
 
 function filterByCategory(evt, categoryId) {
@@ -141,26 +139,26 @@ function addToCart(evt, id) {
     if (evt) {
         evt.stopPropagation();
     }
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const item = cart.find(i => i.id === id);
-    
-    if (item) item.qty++;
-    else cart.push({ id, qty: 1 });
-    
-    // Zmniejsz stock w allProducts
+
     const product = allProducts.find(p => p.id === id);
-    if (product && product.stock > 0) {
-        product.stock--;
+    const cart = getCart();
+
+    if (!canAddToCart(product, cart)) {
+        return;
     }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
+
+    const item = cart.find(i => i.id === id);
+
+    if (item) {
+        item.qty++;
+    } else {
+        cart.push({ id, qty: 1 });
+    }
+
+    saveCart(cart);
     updateCartBadge();
-    updateCartDropdown();
-    
-    // Re-render current view
     applyFilter();
-    
-    // Update modal if open
+
     if (currentModalProductId === id) {
         openProductModal(id);
     }
@@ -170,58 +168,46 @@ function removeFromCart(evt, id) {
     if (evt) {
         evt.stopPropagation();
     }
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    let cart = getCart();
     const item = cart.find(i => i.id === id);
-    
+
     if (item) {
         item.qty--;
         if (item.qty <= 0) {
             cart = cart.filter(i => i.id !== id);
         }
     }
-    
-    // Zwiększ stock w allProducts
-    const product = allProducts.find(p => p.id === id);
-    if (product) {
-        product.stock++;
-    }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
+
+    saveCart(cart);
     updateCartBadge();
-    updateCartDropdown();
-    
-    // Re-render current view
     applyFilter();
-    
-    // Update modal if open
+
     if (currentModalProductId === id) {
         openProductModal(id);
     }
 }
 
 function updateCartBadge() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cart = getCart();
     const cartInfo = document.getElementById('cartInfo');
     const clearCartBtn = document.getElementById('clearCartBtnDropdown');
     
     if (cart.length === 0) {
         cartInfo.style.display = 'none';
+        cartInfo.textContent = '';
         if (clearCartBtn) clearCartBtn.style.display = 'none';
+        updateCartDropdown();
         return;
     }
-    
-    // Oblicz ilość przedmiotów
-    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-    
-    // Oblicz cenę
+
     const totalPrice = cart.reduce((sum, item) => {
         const product = allProducts.find(p => p.id === item.id);
         return sum + (product ? product.price * item.qty : 0);
     }, 0);
-    
-    // Wyświetl info
-    cartInfo.style.display = 'block';
-    cartInfo.innerHTML = `${totalItems} szt. / ${totalPrice.toFixed(2)} zł`;
+
+    cartInfo.textContent = `${totalPrice.toFixed(2)} zł`;
+    cartInfo.style.display = 'inline';
     if (clearCartBtn) clearCartBtn.style.display = 'block';
     
     // Update dropdown
@@ -232,9 +218,8 @@ function clearCartWithConfirm() {
     const confirmed = confirm('Czy na pewno chcesz wyczyścić koszyk?\n\nTa akcja nie może być cofnięta.');
     
     if (confirmed) {
-        localStorage.removeItem('cart');
+        saveCart([]);
         updateCartBadge();
-        updateCartDropdown();
         applyFilter();
         closeProductModal();
     }
@@ -272,39 +257,72 @@ function openProductModal(id) {
     if (!product) return;
 
     currentModalProductId = id;
-    currentModalQuantity = 1;
 
     const modal = document.getElementById('productModal');
     const title = document.getElementById('modalTitle');
     const desc = document.getElementById('modalDescription');
     const img = document.getElementById('modalImage');
     const price = document.getElementById('modalPrice');
-    const stock = document.getElementById('modalStock');
-    const qtyDisplay = document.getElementById('modalQtyDisplay');
-    const qtyMinusBtn = document.getElementById('modalQtyMinus');
-    const qtyPlusBtn = document.getElementById('modalQtyPlus');
+    const stockEl = document.getElementById('modalStock');
 
     title.textContent = product.name || '';
     desc.textContent = product.description || 'Brak opisu produktu.';
     img.src = (product.image && product.image.trim() !== '') ? `/uploads/${product.image}` : '/uploads/No_Image_Available.jpg';
     price.textContent = `${product.price} zł`;
-    qtyDisplay.textContent = currentModalQuantity;
-    
-    // Update button states
-    qtyMinusBtn.disabled = currentModalQuantity <= 1;
-    qtyPlusBtn.disabled = product.stock <= currentModalQuantity;
-    
-    const stockEl = document.getElementById('modalStock');
-    if (product.stock > 0) {
-        stockEl.textContent = `${product.stock} szt. dostępne`;
+
+    const cart = getCart();
+    const available = getAvailableStock(product, cart);
+
+    if (available > 0) {
+        stockEl.textContent = `${available} szt. dostępne`;
         stockEl.classList.remove('out-of-stock');
     } else {
         stockEl.textContent = 'Brak w magazynie';
         stockEl.classList.add('out-of-stock');
     }
 
+    renderModalCartControls(id);
+
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
+}
+
+function renderModalCartControls(productId) {
+    const container = document.getElementById('modalCartControls');
+    if (!container) return;
+
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) return;
+
+    const cart = getCart();
+    const qty = getCartQty(cart, productId);
+
+    if (qty === 0) {
+        if (isProductUnavailable(product, cart)) {
+            container.innerHTML = '<span class="product-unavailable product-unavailable-modal">Produkt niedostępny</span>';
+            return;
+        }
+
+        container.innerHTML = `
+            <button onclick="addToCartFromModal(event)" class="btn-add-modal btn-add-modal-full">
+                <i class="bi bi-plus-lg"></i> Dodaj do koszyka
+            </button>
+        `;
+        return;
+    }
+
+    const plusDisabled = canAddToCart(product, cart) ? '' : 'disabled';
+    container.innerHTML = `
+        <div class="product-quantity-controls modal-cart-qty-controls">
+            <button onclick="removeFromCart(event, ${productId})" class="qty-btn qty-minus">
+                <i class="bi bi-dash-lg"></i>
+            </button>
+            <span class="qty-display">${qty}</span>
+            <button onclick="addToCart(event, ${productId})" class="qty-btn qty-plus" ${plusDisabled}>
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
+    `;
 }
 
 function closeProductModal() {
@@ -315,50 +333,10 @@ function closeProductModal() {
     currentModalProductId = null;
 }
 
-function addToCartFromModal() {
+function addToCartFromModal(evt) {
+    if (evt) evt.stopPropagation();
     if (!currentModalProductId) return;
     addToCart(null, currentModalProductId);
-}
-
-function incrementModalQuantity() {
-    const product = allProducts.find(p => p.id === currentModalProductId);
-    if (!product || currentModalQuantity >= product.stock) return;
-    currentModalQuantity++;
-    document.getElementById('modalQtyDisplay').textContent = currentModalQuantity;
-}
-
-function decrementModalQuantity() {
-    if (currentModalQuantity > 1) {
-        currentModalQuantity--;
-        document.getElementById('modalQtyDisplay').textContent = currentModalQuantity;
-    }
-}
-
-function addMultipleToCart() {
-    if (!currentModalProductId || currentModalQuantity < 1) return;
-    
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const item = cart.find(i => i.id === currentModalProductId);
-    
-    if (item) {
-        item.qty += currentModalQuantity;
-    } else {
-        cart.push({ id: currentModalProductId, qty: currentModalQuantity });
-    }
-    
-    // Zmniejsz stock w allProducts
-    const product = allProducts.find(p => p.id === currentModalProductId);
-    if (product && product.stock >= currentModalQuantity) {
-        product.stock -= currentModalQuantity;
-    }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartBadge();
-    updateCartDropdown();
-    applyFilter();
-    
-    // Reset modal quantity
-    currentModalQuantity = 1;
 }
 
 // close modal when clicking outside content or pressing Escape
@@ -405,7 +383,7 @@ function closeCartDropdown() {
 }
 
 function updateCartDropdown() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cart = getCart();
     const dropdownItems = document.getElementById('cartDropdownItems');
     const clearBtn = document.getElementById('clearCartBtnDropdown');
     
@@ -413,7 +391,7 @@ function updateCartDropdown() {
     
     if (cart.length === 0) {
         dropdownItems.innerHTML = '<div class="cart-empty-dropdown">Koszyk jest pusty</div>';
-        clearBtn.style.display = 'none';
+        if (clearBtn) clearBtn.style.display = 'none';
         return;
     }
     
@@ -422,6 +400,7 @@ function updateCartDropdown() {
         if (!product) return '';
         
         const itemTotal = product.price * cartItem.qty;
+        const plusDisabled = canAddToCart(product, cart) ? '' : 'disabled';
         return `
             <div class="cart-item-dropdown">
                 <div class="cart-item-info-dropdown">
@@ -433,7 +412,7 @@ function updateCartDropdown() {
                         <i class="bi bi-dash-lg"></i>
                     </button>
                     <span class="qty-display-mini">${cartItem.qty}</span>
-                    <button class="qty-btn-mini" onclick="addToCart(event, ${product.id})">
+                    <button class="qty-btn-mini" onclick="addToCart(event, ${product.id})" ${plusDisabled}>
                         <i class="bi bi-plus-lg"></i>
                     </button>
                 </div>
@@ -441,7 +420,7 @@ function updateCartDropdown() {
         `;
     }).join('');
     
-    clearBtn.style.display = 'block';
+    if (clearBtn) clearBtn.style.display = 'block';
 }
 
 // Close dropdown when clicking outside (optional additional layer)

@@ -12,9 +12,11 @@
     "@adminjs/sequelize": "^3.0.0",
     "@adminjs/upload": "^3.0.1",
     "adminjs": "^6.8.7",
+    "dotenv": "^17.4.2",
     "express": "^4.21.2",
     "sequelize": "^6.37.8",
-    "sqlite3": "^6.0.1"
+    "sqlite3": "^6.0.1",
+    "stripe": "^22.2.2"
   },
   "scripts": {
     "start": "node server.js",

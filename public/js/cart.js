@@ -3,15 +3,8 @@ let products = [];
 async function loadProducts() {
     const res = await fetch('/api/products');
     products = await res.json();
+    validateCartAgainstStock(products);
     renderCart();
-}
-
-function getCart() {
-    return JSON.parse(localStorage.getItem('cart') || '[]');
-}
-
-function saveCart(cart) {
-    localStorage.setItem('cart', JSON.stringify(cart));
 }
 
 function renderCart() {
@@ -21,7 +14,7 @@ function renderCart() {
     if (cart.length === 0) {
         container.innerHTML = `
             <div class="cart-empty">
-                <i class="bi bi-bag-x" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                <i class="bi bi-bag-x"></i>
                 <p>Twój koszyk jest pusty</p>
                 <a href="/index.html">
                     <i class="bi bi-arrow-left"></i> Powrót do sklepu
@@ -36,22 +29,33 @@ function renderCart() {
 
     const itemsHTML = cart.map(item => {
         const product = products.find(p => p.id === item.id);
+        if (!product) return '';
+
         const sum = product.price * item.qty;
         total += sum;
         totalQty += item.qty;
+        const imageUrl = product.image && product.image.trim() !== ''
+            ? `/uploads/${product.image}`
+            : '/uploads/No_Image_Available.jpg';
+        const plusDisabled = canAddToCart(product, cart) ? '' : 'disabled';
 
         return `
             <div class="cart-item">
                 <div class="cart-item-info">
-                    <h5 class="cart-item-name">${product.name}</h5>
-                    <span class="cart-item-price">Cena jednostkowa: ${product.price} zł</span>
+                    <div class="cart-item-image">
+                        <img src="${imageUrl}" alt="${product.name}">
+                    </div>
+                    <div class="cart-item-details">
+                        <h5 class="cart-item-name">${product.name}</h5>
+                        <span class="cart-item-price">Cena jednostkowa: ${product.price} zł</span>
+                    </div>
                 </div>
                 <div class="cart-item-qty">
                     <button class="qty-btn-small" onclick="decreaseQty(${item.id})">
                         <i class="bi bi-dash-lg"></i>
                     </button>
                     <span class="qty-display-small">${item.qty}</span>
-                    <button class="qty-btn-small" onclick="increaseQty(${item.id})">
+                    <button class="qty-btn-small" onclick="increaseQty(${item.id})" ${plusDisabled}>
                         <i class="bi bi-plus-lg"></i>
                     </button>
                 </div>
@@ -93,7 +97,13 @@ function renderCart() {
 }
 
 function increaseQty(id) {
-    let cart = getCart();
+    const product = products.find(p => p.id === id);
+    const cart = getCart();
+
+    if (!canAddToCart(product, cart)) {
+        return;
+    }
+
     const item = cart.find(i => i.id === id);
     if (item) {
         item.qty++;

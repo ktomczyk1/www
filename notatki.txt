@@ -29,4 +29,16 @@ app.get("/test-product", async (req, res) => {
 
   res.json(product);
 });
+
+
+stripe:
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+karta testowa:
+4242 4242 4242 4242 
+data przyszła
+cvc dowolne
+
+
+dashboard:
+https://dashboard.stripe.com/acct_1TkjCQL9hrGgdBs2/test/dashboard
 */

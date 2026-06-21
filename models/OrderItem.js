@@ -14,13 +14,31 @@ const OrderItem = sequelize.define("OrderItem", {
   price: {
     type: DataTypes.FLOAT,
     allowNull: false
+  },
+
+  orderId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Order,
+      key: "id"
+    }
+  },
+
+  productId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Product,
+      key: "id"
+    }
   }
 });
 
-Order.hasMany(OrderItem);
-OrderItem.belongsTo(Order);
+Order.hasMany(OrderItem, { foreignKey: "orderId" });
+OrderItem.belongsTo(Order, { foreignKey: "orderId" });
 
-Product.hasMany(OrderItem);
-OrderItem.belongsTo(Product);
+Product.hasMany(OrderItem, { foreignKey: "productId" });
+OrderItem.belongsTo(Product, { foreignKey: "productId" });
 
 module.exports = OrderItem;

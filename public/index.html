@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sklep</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
@@ -15,7 +16,8 @@
         <div class="row align-items-center">
             <div class="col">
                 <a href="/" class="store-logo">
-                    <img src="/uploads/Logo_sklepu.jpeg" alt="Logo sklepu" class="logo-image">
+                    <img src="/uploads/Logo_sklepu.jpg" alt="Logo sklepu" class="logo-image">
+                    <span class="store-name">Sklep</span>
                 </a>
             </div>
             <div class="col-auto header-controls">
@@ -25,9 +27,9 @@
                 <div class="cart-dropdown" id="cartDropdownWrapper" onmouseover="openCartDropdown()" onmouseout="closeCartDropdownDelay()">
                     <button class="cart-btn" id="cartToggleBtn">
                         <i class="bi bi-bag"></i>
-                        <span>Koszyk</span>
+                        <span class="cart-btn-label">Koszyk</span>
+                        <span class="cart-price" id="cartInfo" style="display: none;"></span>
                     </button>
-                    <div class="cart-info" id="cartInfo" style="display: none;"></div>
                     <div class="cart-dropdown-menu" id="cartDropdownMenu">
                         <div class="cart-dropdown-header">
                             <span>Twój koszyk</span>
@@ -90,25 +92,15 @@
                     <h4>Opis i Parametry</h4>
                     <p id="modalDescription"></p>
                 </div>
-                <div class="product-modal-footer">
-                    <div class="modal-quantity-controls">
-                        <button class="qty-btn-modal" id="modalQtyMinus" onclick="decrementModalQuantity()">
-                            <i class="bi bi-dash-lg"></i>
-                        </button>
-                        <span class="qty-display-modal" id="modalQtyDisplay">1</span>
-                        <button class="qty-btn-modal" id="modalQtyPlus" onclick="incrementModalQuantity()">
-                            <i class="bi bi-plus-lg"></i>
-                        </button>
-                    </div>
-                    <button onclick="addMultipleToCart()" class="btn-add-modal">
-                        <i class="bi bi-plus-lg"></i> Dodaj do koszyka
-                    </button>
+                <div class="product-modal-footer" id="modalCartControls">
+                    <!-- Sterowanie koszykiem renderowane przez JS -->
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script src="js/cartStock.js"></script>
 <script src="js/index.js"></script>
 
 </body>
