@@ -8,19 +8,22 @@ const Product = sequelize.define("Product", {
         allowNull: false
     },
     description: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        allowNull: false
     },
     price: {
         type: DataTypes.FLOAT,
         allowNull: false
     },
     image: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
     },
     stock: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-}
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+    }
 });
 
 Category.hasMany(Product);
