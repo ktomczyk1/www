@@ -42,7 +42,7 @@ async function markOrderPaid(orderId) {
 async function cancelPendingOrder(orderId) {
     const order = await Order.findByPk(orderId);
 
-    if (!order || order.status !== "pending") {
+    if (!order || order.status !== "oczekujące") {
         return order;
     }
 
@@ -189,7 +189,7 @@ app.post("/api/checkout", async (req, res) => {
             email,
             phone,
             address,
-            status: "pending",
+            status: "oczekujące",
             totalPrice: 0
         }, { transaction });
 
