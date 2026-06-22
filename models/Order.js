@@ -28,7 +28,7 @@ const Order = sequelize.define("Order", {
 
   status: {
     type: DataTypes.STRING,
-    defaultValue: "pending"
+    defaultValue: "oczekujące"
   },
 
   totalPrice: {
