@@ -274,6 +274,19 @@ function resetSubmitButton(submitBtn) {
     submitBtn.innerHTML = '<i class="bi bi-credit-card"></i> Złóż zamówienie i zapłać';
 }
 
+function showPaymentSuccess() {
+    const modal = document.getElementById('paymentSuccessModal');
+    if (!modal) return;
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(() => {
+        window.location.href = '/index.html';
+    }, 3500);
+}
+
 async function handlePaymentReturn() {
     const params = new URLSearchParams(window.location.search);
     const paymentStatus = params.get('payment');
@@ -309,8 +322,8 @@ async function handlePaymentReturn() {
 
         if (res.ok && result.paid) {
             localStorage.removeItem('cart');
-            alert(`✅ Płatność została potwierdzona!\n\nNumer zamówienia: ${result.orderId}`);
-            window.location.href = '/index.html';
+            window.history.replaceState({}, document.title, '/checkout.html');
+            showPaymentSuccess();
             return;
         }
 
